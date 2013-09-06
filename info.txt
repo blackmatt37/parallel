@@ -1,0 +1,18 @@
+Matthew
+Kramer
+
+matthewkram@gmail.com
+11
+10
+AI
+Torbert
+9
+AP
+Rose
+10
+Machine Learning
+Andrew Ng
+10
+Into to Functional Programming
+Martin Odersky
+
