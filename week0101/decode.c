@@ -2,6 +2,6 @@
 
 int main(int argc, char const *argv[])
 {
-	FILE* input = fopen("decode.txt", "r");
+	printf("This is a test\n");
 	return 0;
 }
