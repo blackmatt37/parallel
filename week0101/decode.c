@@ -8,6 +8,7 @@ int main(int argc, char const *argv[])
 	bzero(arr, 1000);
 	char ch;
 	int location;
+<<<<<<< Updated upstream
 	for (int i = 0; i < 1000; ++i)
 	{
 		i[arr] = '*';
@@ -36,7 +37,7 @@ int main(int argc, char const *argv[])
 				arr[location] = temp;
 				// printf("THIS IS A DEBUG STATEMENT\n");
 				break;
-			}		
+			}
 		}
 	}
 	FILE* message = fopen("message.txt", "r");
