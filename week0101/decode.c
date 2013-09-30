@@ -34,7 +34,6 @@ int main(int argc, char const *argv[])
 			else
 			{
 				arr[location] = temp;
-				// printf("THIS IS A DEBUG STATEMENT\n");
 				break;
 			}
 		}
