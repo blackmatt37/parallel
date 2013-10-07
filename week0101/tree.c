@@ -10,8 +10,10 @@
 #define WIDTH 50
 #endif
 void display(int[][WIDTH]);
-void burn(int[][WIDTH]);
+int burn(int[][WIDTH]);
 int inBound(int, int);
+
+
 int main(int argc, char const *argv[])
 {
 	int forest[HEIGHT][WIDTH];
@@ -21,8 +23,8 @@ int main(int argc, char const *argv[])
 	{
 		for (int j = 0; j < WIDTH; ++j)
 		{
-			float p = random()/RAND_MAX;
-			if(p > 0.5)
+			float p = 1.0*random()/RAND_MAX;
+			if(p < 0.9)
 				forest[i][j] = 1;
 		}
 	}
@@ -35,17 +37,20 @@ int main(int argc, char const *argv[])
 	}
 	display(forest);
 	printf("\n");
-	for (int i = 0; i < WIDTH; ++i)
+	while (true)
 	{
-		burn(forest);
+		if(!burn(forest))
+			break;
 		display(forest);
 		printf("\n");
-
 	}
-	
-	
-
 }
+
+
+
+
+
+
 
 void display(int f[][WIDTH])
 {
@@ -66,15 +71,15 @@ void display(int f[][WIDTH])
 		printf("\n");
 	}
 }
-void burn(int f[][WIDTH])
+int burn(int f[][WIDTH])
 {
 	for (int i = 0; i < HEIGHT; ++i)
 	{
 		for (int j = 0; j < WIDTH; ++j)
 		{
-			if(f[i][j] == 2)
+			if(f[i][j] == 2) // if the tree is on fire
 			{
-				f[i][j] = 0;
+				f[i][j] = 0; //remove the currently burning tree
 				if(inBound(i+1, j) && f[i+1][j] == 1)
 					f[i+1][j] = 3;
 				if(inBound(i-1, j) && f[i-1][j] == 1)
@@ -86,14 +91,19 @@ void burn(int f[][WIDTH])
 			}
 		}
 	}
+	int q = 0;
 	for (int i = 0; i < HEIGHT; ++i)
 	{
 		for (int j = 0; j < WIDTH; ++j)
 		{
-			if(f[i][j] == 3)
+			if(f[i][j] == 3) //change the intermediate to a fire
+			{	
 				f[i][j] = 2;
+				q++;
+			}
 		}
 	}
+	return q;
 }
 int inBound(int h, int w)
 {
