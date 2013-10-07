@@ -10,6 +10,8 @@
 #define WIDTH 50
 #endif
 void display(int[][WIDTH]);
+void burn(int[][WIDTH]);
+int inBound(int, int);
 int main(int argc, char const *argv[])
 {
 	int forest[HEIGHT][WIDTH];
@@ -19,17 +21,30 @@ int main(int argc, char const *argv[])
 	{
 		for (int j = 0; j < WIDTH; ++j)
 		{
-			int p = random();
-			if(p > RAND_MAX/2)
+			float p = random()/RAND_MAX;
+			if(p > 0.5)
 				forest[i][j] = 1;
 		}
 	}
 	display(forest);
+	printf("\n");
 	for (int i = 0; i < HEIGHT; ++i)
 	{
-		forest[i][0] = 2;
+		if(forest[i][0] == 1)
+			forest[i][0] = 2;
 	}
 	display(forest);
+	printf("\n");
+	for (int i = 0; i < WIDTH; ++i)
+	{
+		burn(forest);
+		display(forest);
+		printf("\n");
+
+	}
+	
+	
+
 }
 
 void display(int f[][WIDTH])
@@ -50,4 +65,37 @@ void display(int f[][WIDTH])
 		}
 		printf("\n");
 	}
+}
+void burn(int f[][WIDTH])
+{
+	for (int i = 0; i < HEIGHT; ++i)
+	{
+		for (int j = 0; j < WIDTH; ++j)
+		{
+			if(f[i][j] == 2)
+			{
+				f[i][j] = 0;
+				if(inBound(i+1, j) && f[i+1][j] == 1)
+					f[i+1][j] = 3;
+				if(inBound(i-1, j) && f[i-1][j] == 1)
+					f[i-1][j] = 3;
+				if(inBound(i, j+1) && f[i][j+1] == 1)
+					f[i][j+1] = 3;
+				if(inBound(i, j-1) && f[i][j-1] == 1)
+					f[i][j-1] = 3;
+			}
+		}
+	}
+	for (int i = 0; i < HEIGHT; ++i)
+	{
+		for (int j = 0; j < WIDTH; ++j)
+		{
+			if(f[i][j] == 3)
+				f[i][j] = 2;
+		}
+	}
+}
+int inBound(int h, int w)
+{
+	return (h < HEIGHT && h >= 0 && w >=0 && w < WIDTH);
 }
