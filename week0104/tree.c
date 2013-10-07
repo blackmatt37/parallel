@@ -9,41 +9,27 @@
 #ifndef WIDTH
 #define WIDTH 50
 #endif
-void display(int[][WIDTH]);
-int burn(int[][WIDTH]);
+
+void display(char[][WIDTH]);
+int burnStep(char[][WIDTH]);
 int inBound(int, int);
+int burn(double);
 
 
 int main(int argc, char const *argv[])
 {
-	int forest[HEIGHT][WIDTH];
-	bzero(forest, sizeof(int)*HEIGHT*WIDTH);
 	srandom(1234);
-	for (int i = 0; i < HEIGHT; ++i)
+	for (double prob = 0.1; prob < 1.0; prob+=0.1)
 	{
-		for (int j = 0; j < WIDTH; ++j)
+		int total = 0;
+		for (int trial = 0; trial < 10000; ++trial)
 		{
-			float p = 1.0*random()/RAND_MAX;
-			if(p < 0.9)
-				forest[i][j] = 1;
+			total += burn(prob);
 		}
+		printf("%f %f\n", prob, total/(10000.0*WIDTH));
 	}
-	display(forest);
-	printf("\n");
-	for (int i = 0; i < HEIGHT; ++i)
-	{
-		if(forest[i][0] == 1)
-			forest[i][0] = 2;
-	}
-	display(forest);
-	printf("\n");
-	while (true)
-	{
-		if(!burn(forest))
-			break;
-		display(forest);
-		printf("\n");
-	}
+	return 0;
+	
 }
 
 
@@ -52,17 +38,17 @@ int main(int argc, char const *argv[])
 
 
 
-void display(int f[][WIDTH])
+void display(char f[][WIDTH])
 {
 	for (int i = 0; i < HEIGHT; ++i)
 	{
 		for (int j = 0; j < WIDTH; ++j)
 		{
-			if (f[i][j] == 1)
+			if (f[i][j] == 'T')
 				printf("T");
-			else if(f[i][j] == 2)
+			else if(f[i][j] == '*')
 				printf("*");
-			else if(f[i][j] == 3)
+			else if(f[i][j] == '?')
 				printf("?");
 			else
 				printf(" ");
@@ -71,23 +57,23 @@ void display(int f[][WIDTH])
 		printf("\n");
 	}
 }
-int burn(int f[][WIDTH])
+int burnStep(char f[][WIDTH])
 {
 	for (int i = 0; i < HEIGHT; ++i)
 	{
 		for (int j = 0; j < WIDTH; ++j)
 		{
-			if(f[i][j] == 2) // if the tree is on fire
+			if(f[i][j] == '*') // if the tree is on fire
 			{
 				f[i][j] = 0; //remove the currently burning tree
-				if(inBound(i+1, j) && f[i+1][j] == 1)
-					f[i+1][j] = 3;
-				if(inBound(i-1, j) && f[i-1][j] == 1)
-					f[i-1][j] = 3;
-				if(inBound(i, j+1) && f[i][j+1] == 1)
-					f[i][j+1] = 3;
-				if(inBound(i, j-1) && f[i][j-1] == 1)
-					f[i][j-1] = 3;
+				if(inBound(i+1, j) && f[i+1][j] == 'T')
+					f[i+1][j] = '?';
+				if(inBound(i-1, j) && f[i-1][j] == 'T')
+					f[i-1][j] = '?';
+				if(inBound(i, j+1) && f[i][j+1] == 'T')
+					f[i][j+1] = '?';
+				if(inBound(i, j-1) && f[i][j-1] == 'T')
+					f[i][j-1] = '?';
 			}
 		}
 	}
@@ -96,9 +82,9 @@ int burn(int f[][WIDTH])
 	{
 		for (int j = 0; j < WIDTH; ++j)
 		{
-			if(f[i][j] == 3) //change the intermediate to a fire
+			if(f[i][j] == '?') //change the intermediate to a fire
 			{	
-				f[i][j] = 2;
+				f[i][j] = '*';
 				q++;
 			}
 		}
@@ -108,4 +94,35 @@ int burn(int f[][WIDTH])
 int inBound(int h, int w)
 {
 	return (h < HEIGHT && h >= 0 && w >=0 && w < WIDTH);
+}
+
+
+int burn(double prob)
+{
+	char forest[HEIGHT][WIDTH];
+	bzero(forest, sizeof(char)*HEIGHT*WIDTH);
+	for (int i = 0; i < HEIGHT; ++i)
+	{
+		for (int j = 0; j < WIDTH; ++j)
+		{
+			float p = 1.0*random()/RAND_MAX;
+			if(p < prob)
+				forest[i][j] = 'T';
+		}
+	}
+	for (int i = 0; i < HEIGHT; ++i)
+	{
+		if(forest[i][0] == 'T')
+			forest[i][0] = '*';
+	}
+	int stepCount = 0;
+	while (1)
+	{
+		if(!burnStep(forest))
+			break;
+		stepCount++;
+		// display(forest);
+		// printf("\n");
+	}
+	return stepCount;
 }
