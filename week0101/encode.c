@@ -53,9 +53,15 @@ int main(int argc, char const *argv[])
 		nodes[n-1] = NULL;
 		n--;
 	}
-	char* p = malloc(30);
+	char* p = (char*)malloc(30);
 	char e[256][30];
+	bzero(e, 256*30);
 	walk(nodes[0], 0, p, e);
+	for (int i = 0; i < strlen(message);i++)
+	{
+		printf("%s", e[message[i]]);
+	}
+	printf("\n");
 	return 0;
 }
 void walk(Node* current, int depth, char* p, char e[][30])
@@ -65,6 +71,7 @@ void walk(Node* current, int depth, char* p, char e[][30])
 		// printf("%s\n", p);
 		p[depth] = '\0';
 		printf("%c %d %s\n", current->key, current->freq, p);
+		sprintf(e[current->key], "%s", p);
 		return;
 	}
 	p[depth] = '0';
