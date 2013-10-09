@@ -89,7 +89,7 @@ int burnStep(char f[][WIDTH])
 			}
 		}
 	}
-	return q;
+	return q+1;
 }
 int inBound(int h, int w)
 {
