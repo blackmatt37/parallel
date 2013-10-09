@@ -89,7 +89,7 @@ int burnStep(char f[][WIDTH])
 			}
 		}
 	}
-	return q+1;
+	return q;
 }
 int inBound(int h, int w)
 {
@@ -124,5 +124,5 @@ int burn(double prob)
 		// display(forest);
 		// printf("\n");
 	}
-	return stepCount;
+	return stepCount+1;
 }
