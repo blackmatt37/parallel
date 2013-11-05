@@ -1,62 +1,89 @@
+// 
+// Matthew Kramer
+// 
+// mpicc mpitree.c
+// mpirun -np 4 a.out
+// 
+// mpirun -np 4 -machinefile hostlist.txt a.out
+// 
 #include <stdio.h>
-#include <strings.h>
-#include <string.h>
 #include <stdlib.h>
+#include <time.h>
+// 
+#include "mpi.h"
+// 
 
 #ifndef HEIGHT
-#define HEIGHT 8
+#define HEIGHT 100
 #endif
 #ifndef WIDTH
-#define WIDTH 50
+#define WIDTH 100
 #endif
 
-void display(char[][WIDTH]);
 int burnStep(char[][WIDTH]);
 int inBound(int, int);
 int burn(double);
 
-
-int main(int argc, char const *argv[])
+int main(int argc, char* argv[])
 {
-	srandom(42378492340);
-	for (double prob = 0; prob < 1.0; prob+=0.1)
+	//
+	// MPI
+	//
+	int         rank , size ;
+	MPI_Status  status ;
+	int         tag = 0 ;
+	//
+	int worker ;
+	double nextworker ;
+	//
+	// MPI
+	//
+	MPI_Init(&argc,&argv);
+	MPI_Comm_size(MPI_COMM_WORLD,&size);
+	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+	//
+	srand( time(NULL) + rank ) ;
+	//
+	if( rank == 0 ) // manager
 	{
-		int total = 0;
-		for (int trial = 0; trial < 10000; ++trial)
+		for (int i = 1; i < size; ++i)
 		{
-			total += burn(prob);
+			MPI_Send(&i, 1 , MPI_INT , i , tag , MPI_COMM_WORLD );
 		}
-		printf("%f %f\n", prob, total/(10000.0*WIDTH));
+		for (int i = 1; i < size; ++i)
+		{
+			MPI_Recv( &nextworker , 1 , MPI_DOUBLE , MPI_ANY_SOURCE , tag , MPI_COMM_WORLD , &status ) ;
+		//
+			printf("%f\n", nextworker);
+			worker = status.MPI_SOURCE ;
+			nextworker = -1;
+		//
+			MPI_Send( &nextworker , 1 , MPI_DOUBLE , worker , tag , MPI_COMM_WORLD ) ;
+		}
+		
 	}
+	else
+	{
+		while( 1 )
+		{
+			MPI_Recv( &nextworker , 1 , MPI_DOUBLE , MPI_ANY_SOURCE , tag , MPI_COMM_WORLD , &status ) ;
+			//
+			if( nextworker < 0 ) break; // kill signal
+			//
+			worker = status.MPI_SOURCE ;
+			//
+			MPI_Send( &nextworker , 1 , MPI_DOUBLE , worker , tag , MPI_COMM_WORLD ) ;
+		}
+	}
+	//
+	// MPI
+	//
+	MPI_Finalize();
+	//
 	return 0;
-	
 }
 
 
-
-
-
-
-
-void display(char f[][WIDTH])
-{
-	for (int i = 0; i < HEIGHT; ++i)
-	{
-		for (int j = 0; j < WIDTH; ++j)
-		{
-			if (f[i][j] == 'T')
-				printf("T");
-			else if(f[i][j] == '*')
-				printf("*");
-			else if(f[i][j] == '?')
-				printf("?");
-			else
-				printf(" ");
-			// printf("%d\n", forest[i][j]);
-		}
-		printf("\n");
-	}
-}
 int burnStep(char f[][WIDTH])
 {
 	for (int i = 0; i < HEIGHT; ++i)
@@ -126,3 +153,6 @@ int burn(double prob)
 	}
 	return stepCount+1;
 }
+// 
+// end of file
+// 

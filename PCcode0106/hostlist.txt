@@ -1,0 +1,12 @@
+localhost
+fortran
+lisp
+ml
+prolog
+c
+ruby
+asm
+python
+php
+basic
+haskell

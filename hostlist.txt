@@ -1,0 +1,13 @@
+swedishchef
+asm
+basic
+c
+fortran
+haskell
+java
+lisp
+ml
+php
+prolog
+python
+ruby
