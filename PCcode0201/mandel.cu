@@ -10,16 +10,16 @@ int tmax = 100;
 
 
 
-int mandel(double, double, int);
+// int mandel(double, double, int);
 void translate(int, int, double*, double*);
 __device__ double translatex(int x)
 {
-	return x/100.0 - 2.0;
+	return x*1.0/100.0 - 2.0;
 
 }
 __device__ double translatey(int y)
 {
-	return y/100.0 - 1.5;
+	return y*1.0/100.0 - 1.5;
 
 }
 
@@ -56,8 +56,8 @@ void displayfunc(void)
 	int *gpu_t;
 	cudaMalloc((void**)&gpu_t, HEIGHT*WIDTH*sizeof(int));
 	printf("Declared array\n");
-	int cpu_t[WIDTH][HEIGHT];
-	dim3 grid(HEIGHT, WIDTH);
+	int cpu_t[HEIGHT][WIDTH];
+	dim3 grid(WIDTH, HEIGHT);
 	mandel<<<grid, 1>>>(gpu_t);
 	printf("Called the kernel\n");
 	cudaMemcpy(cpu_t, gpu_t, HEIGHT*WIDTH*sizeof(int), cudaMemcpyDeviceToHost);
@@ -145,22 +145,22 @@ int main(int argc, char *argv[])
 }
 
 
-int mandel(double x, double y, int tmax)
-{
-	double a = 0.0;
-	double b = 0.0;
-	int i;
-	for(i=0; i<tmax; i++)
-	{
-		double anew = a*a - b*b + x;
-		double bnew = 2*a*b + y;
-		a = anew;
-		b = bnew;
-		if(a*a + b*b > 4.0)
-			break;
-	}
-	return (i+1);
-}
+// int mandel(double x, double y, int tmax)
+// {
+// 	double a = 0.0;
+// 	double b = 0.0;
+// 	int i;
+// 	for(i=0; i<tmax; i++)
+// 	{
+// 		double anew = a*a - b*b + x;
+// 		double bnew = 2*a*b + y;
+// 		a = anew;
+// 		b = bnew;
+// 		if(a*a + b*b > 4.0)
+// 			break;
+// 	}
+// 	return (i+1);
+// }
 
 void translate(int x, int y, double* a, double* b)
 {
