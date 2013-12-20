@@ -2,7 +2,7 @@
 #include <GL/glut.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
-
+#include "mpi.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -73,10 +73,13 @@ void displayfunc(void)
      	//
      	glBegin(GL_POINTS);
      	glVertex2f(x%WIDTH, x/WIDTH);
-     	glEnd();	
+     	glEnd();
+     	// if(x%WIDTH == 0 ) glutSwapBuffers();	
 	}
+	
+	cudaFree(gpu_t);
 	glutSwapBuffers();
-
+	// exit(0);
 	// printf("Displayed data\n");
 
 }
@@ -103,7 +106,7 @@ void mousefunc(int button,int state,int xscr,int yscr)
       center_y = ynew;
       center_dx*= 0.7;
       center_dy*= 0.7;
-      printf("(%e, %e. %e, %e)\n", center_x, center_y, center_dx, center_dy);
+      printf("(%0.16f, %0.16f. %0.16f, %0.16f)\n", center_x, center_y, center_dx, center_dy);
       glutPostRedisplay();
    }
    else if(button==GLUT_RIGHT_BUTTON && state==GLUT_DOWN)
@@ -116,7 +119,7 @@ void mousefunc(int button,int state,int xscr,int yscr)
       center_y = ynew;
       center_dx/= 0.7;
       center_dy/= 0.7;
-      printf("(%e, %e. %e, %e)\n", center_x, center_y, center_dx, center_dy);
+      printf("(%0.16f, %0.16f. %0.16f, %0.16f)\n", center_x, center_y, center_dx, center_dy);
       glutPostRedisplay();
    }
 }
@@ -151,16 +154,15 @@ void specialfunc(int key,int xscr,int yscr)
 void closefunc(void)
 {
    printf("Window closed.\n");
-   cudaFree(gpu_t);
    printf("MEM CLEARED\n");
 }
 
 int main(int argc, char *argv[])
 {
-	center_x = -0.7;
-	center_y = 0.0088;
-	center_dx = 0.0000475;
-	center_dy = 0.0000338;
+	center_x = 0.4099716787079002;
+	center_y = -0.1482886524476352;
+	center_dx = 0.0002682137239328;
+	center_dy = 0.0002011602929496;
 	tmax = 400;
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
