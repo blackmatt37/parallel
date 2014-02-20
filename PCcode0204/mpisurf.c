@@ -20,7 +20,7 @@ int start;
 
 
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
 	MPI_Init(&argc,&argv);
 	MPI_Comm_size(MPI_COMM_WORLD,&size);
@@ -28,11 +28,32 @@ int main(int argc, char const *argv[])
 
 	if( rank == 0 ) // manager
 	{
-		double x,y,z;
-		for(x=-40;x<=50;x+=(50+40)/41)
+		double x;
+		x = -40;
+		int q;
+		for(q=1;q<size;q++)
 		{
-			
+			MPI_Send(&x, 1 , MPI_DOUBLE , q , tag , MPI_COMM_WORLD );
+			x+=(50+40)/41;
+		}
+		while(x <= 50)
+		{
+			double temp;
+			double error[42];
+			MPI_Recv( &temp , 1 , MPI_DOUBLE , MPI_ANY_SOURCE , tag , MPI_COMM_WORLD , &status ) ;
+			worker = status.MPI_SOURCE ;
+			MPI_Recv( &error , 42 , MPI_DOUBLE , worker , tag , MPI_COMM_WORLD , &status ) ;
+
+			double y;
+			int p = 0;
+			for(y=-1490;y<=1000;y+=(1000+1490)/41)
+			{
+				printf("%f %f %f\n", temp,y, error[p]);
+				p++;
+			}
 			printf("\n");
+			MPI_Send(&x, 1 , MPI_DOUBLE , worker , tag , MPI_COMM_WORLD );
+			x+=(50+40)/41;
 		}
 	}
 	else
@@ -43,6 +64,7 @@ int main(int argc, char const *argv[])
 			MPI_Recv( &worker_x, 1 , MPI_DOUBLE , MPI_ANY_SOURCE , tag , MPI_COMM_WORLD , &status );
 			int p = 0;
 			double error[42];
+			double y;
 			for(y=-1490;y<=1000;y+=(1000+1490)/41)
 			{
 				int trial;
@@ -77,8 +99,8 @@ int main(int argc, char const *argv[])
 				p++;
 				// printf("%f %f %f\n", x,y, error);
 			}
-			MPI_Send(&worker_x , 1 , MPI_DOUBLE , worker , tag , MPI_COMM_WORLD ) ;
-			MPI_Send(error, 42, MPI_DOUBLE, worker, tag, MPI_COMM_WORLD);
+			MPI_Send(&worker_x , 1 , MPI_DOUBLE , 0 , tag , MPI_COMM_WORLD ) ;
+			MPI_Send(error, 42, MPI_DOUBLE, 0, tag, MPI_COMM_WORLD);
 
 		}
 	}
